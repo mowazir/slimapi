@@ -13,12 +13,12 @@ $app = AppFactory::create();
 
 $app->get('/api/products', function(Request $request, Response $response) {
 
-    $dsn = "mysql:host=127.0.0.1;dbname=slimapidb;charset=utf8";
+    require dirname(__DIR__) . '/src/App/Database.php';
 
-    $pdo =  new PDO($dsn, 'root', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    $database =  new App\Database;
 
+    $pdo = $database->getConnection();
+    
     $stmt = $pdo->query('SELECT * FROM product');
 
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
