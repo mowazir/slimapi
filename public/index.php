@@ -13,15 +13,11 @@ $app = AppFactory::create();
 
 $app->get('/api/products', function(Request $request, Response $response) {
 
-    require dirname(__DIR__) . '/src/App/Database.php';
-
     $database =  new App\Database;
 
-    $pdo = $database->getConnection();
-    
-    $stmt = $pdo->query('SELECT * FROM product');
+    $repository = new App\Repositories\ProductRepository($database);
 
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data = $repository->getAll();
 
     $body = json_encode($data);
 
