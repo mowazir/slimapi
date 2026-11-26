@@ -42,9 +42,21 @@ $app->get('/api/products', function(Request $request, Response $response) {
 
 $app->get('/api/products/{id:[0-9]+}', function(Request $request, Response $response, string $id){
 
-    $response->getBody()->write($id);
+    $repository =  $this->get(App\Repositories\ProductRepository::class);
 
-    return $response;
+    $product = $repository->getById((int) $id);
+
+    if($product === false) {
+        throw new \Slim\Exception\HttpNotFoundException($request, message: 'product not found');
+        
+    }
+
+    $body = json_encode($product);
+
+    $response->getBody()->write($body);
+
+    return $response->withHeader('Content-Type', 'application/json');
+
 });
 
 
