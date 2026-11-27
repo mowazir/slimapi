@@ -26,6 +26,12 @@ $collector = $app->getRouteCollector();
 
 $collector->setDefaultInvocationStrategy(new RequestResponseArgs);
 
+$error_middleware = $app->addErrorMiddleware(true, true, true);
+
+$error_handler = $error_middleware->getDefaultErrorHandler();
+
+$error_handler->forceContentType('application/json');
+
 $app->get('/api/products', function(Request $request, Response $response) {
 
     $repository = $this->get(ProductRepository::class);
