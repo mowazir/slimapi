@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Handlers\Strategies\RequestResponseArgs;
-
+use App\Middleware\AddJsonResponseHeader;
 
 define('APP_ROOT', dirname(__DIR__));
 
@@ -32,6 +32,8 @@ $error_handler = $error_middleware->getDefaultErrorHandler();
 
 $error_handler->forceContentType('application/json');
 
+$app->add(new AddJsonResponseHeader);
+
 $app->get('/api/products', function(Request $request, Response $response) {
 
     $repository = $this->get(ProductRepository::class);
@@ -42,28 +44,21 @@ $app->get('/api/products', function(Request $request, Response $response) {
 
     $response->getBody()->write($body);
 
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response;
 
 });
 
 $app->get('/api/products/{id:[0-9]+}', function(Request $request, Response $response, string $id){
 
-    $repository =  $this->get(App\Repositories\ProductRepository::class);
-
-    $product = $repository->getById((int) $id);
-
-    if($product === false) {
-        throw new \Slim\Exception\HttpNotFoundException($request, message: 'product not found');
-        
-    }
+    $product =  $request->getAttribute('product');
 
     $body = json_encode($product);
 
     $response->getBody()->write($body);
 
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response;
 
-});
+})->add(App\Middleware\GetProduct::class);
 
 
 $app->run();
