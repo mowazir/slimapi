@@ -34,31 +34,10 @@ $error_handler->forceContentType('application/json');
 
 $app->add(new AddJsonResponseHeader);
 
-$app->get('/api/products', function(Request $request, Response $response) {
+$app->get('/api/products', App\Controllers\ProductIndex::class);
 
-    $repository = $this->get(ProductRepository::class);
-
-    $data = $repository->getAll();
-
-    $body = json_encode($data);
-
-    $response->getBody()->write($body);
-
-    return $response;
-
-});
-
-$app->get('/api/products/{id:[0-9]+}', function(Request $request, Response $response, string $id){
-
-    $product =  $request->getAttribute('product');
-
-    $body = json_encode($product);
-
-    $response->getBody()->write($body);
-
-    return $response;
-
-})->add(App\Middleware\GetProduct::class);
+$app->get('/api/products/{id:[0-9]+}', App\Controllers\Product::class . ':show')
+    ->add(App\Middleware\GetProduct::class);
 
 
 $app->run();
